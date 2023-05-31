@@ -25,10 +25,10 @@ public class OrderingCardDeliveryTest {
         $("[data-test-id ='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id ='date'] input").setValue(generateDate(4, "dd.MM.YYYY"));
         $("[data-test-id='name'] input ").setValue("Велев Максим");
-        $("[data-test-id='phone'] input ").setValue("+7975624917+");
+        $("[data-test-id='phone'] input ").setValue("+79756249171");
         $("[data-test-id='agreement']").click();
         $("[type=button] .button__content").click();
-        $(withText("Встреча успешно забронирована на")).shouldBe(Condition.visible, Duration.ofSeconds(5000));
+        $(withText("Встреча успешно забронирована на")).shouldBe(Condition.visible);
     }
 
     @Test
