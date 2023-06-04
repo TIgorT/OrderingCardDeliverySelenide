@@ -1,17 +1,14 @@
 package ru.netology;
 
 import com.codeborne.selenide.Condition;
-
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 
 import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Condition.text;
-
 import static com.codeborne.selenide.Selenide.*;
 import static java.time.LocalDate.*;
 
@@ -212,20 +209,26 @@ public class OrderingCardDeliveryTest {
 
     ////////////// Задача №2: взаимодействие с комплексными элементами (необязательная)////////////
 
-    String generateDateSecond(int dayToAdd) {
-        return now().plusDays(dayToAdd).format(DateTimeFormatter.ofPattern("MM"));
+    String DateSecond(int dayToAdd, int monthToAdd) {
+        return now().plusDays(dayToAdd).plusMonths(monthToAdd).format(DateTimeFormatter.ofPattern("MM"));
     }
 
-    String lastDayOfTheCurrentYearOfTheMonth() {
-        return now().with(TemporalAdjusters.firstDayOfNextMonth()).format(DateTimeFormatter.ofPattern("MM"));
+    String DateSecondFormat(int dayToAdd, int monthToAdd) {
+        return now().plusDays(dayToAdd).plusMonths(monthToAdd).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
+
+    String simplyDate(int daysToAdd) {
+        return now().plusDays(daysToAdd).format(DateTimeFormatter.ofPattern("dd"));
     }
 
     @Test
-    // Бронь в следующем месяце
+    // Планируем бронь карты через неделю
     public void orderCardDeliveryTestTwelfth() {
 
-        String planningDateSecond = generateDateSecond(29);
-        String planningDate = generateDate(29);
+        String planningDate = DateSecond(3, 0);
+        String planningDateSecond = DateSecond(7, 0);
+        String planningDateInForm = generateDate(7);
+        String planningSimplyDate = simplyDate(7);
 
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Кр");
@@ -233,11 +236,19 @@ public class OrderingCardDeliveryTest {
         $("[type=button] .icon-button__content").click();
         $("[data-test-id ='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
 
-        if (planningDateSecond.equals(lastDayOfTheCurrentYearOfTheMonth())) {
+        if (!planningDate.equals(planningDateSecond)) {
             $("[data-step='1']").click();
         }
 
-        $$("[data-day]").get(0).click();
+        int count = $$("table.calendar__layout td").size();
+
+        for (int i = 0; i < count; i++) {
+            String text = $$("table.calendar__layout td").get(i).getText();
+            if (text.equalsIgnoreCase(planningSimplyDate)) {
+                $$("table.calendar__layout td").get(i).click();
+            }
+
+        }
         $("[data-test-id='name'] input ").setValue("Велев Максим");
         $("[data-test-id='phone'] input ").setValue("+79756249171");
         $("[data-test-id='agreement']").click();
@@ -246,7 +257,47 @@ public class OrderingCardDeliveryTest {
                 .should(text("Успешно"), Duration.ofSeconds(5000))
                 .shouldBe(Condition.visible);
         $("[data-test-id='notification'] .notification__content")
-                .shouldHave(text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(5000))
+                .shouldHave(text("Встреча успешно забронирована на " + planningDateInForm), Duration.ofSeconds(5000))
+                .shouldBe(Condition.visible);
+    }
+
+    @Test
+    // Планируем бронь карты через месяц
+    public void orderCardDeliveryTestThirteenth() {
+
+        String planningDate = DateSecond(3, 0);
+        String planningDateSecondFormat = DateSecondFormat(7, 1);
+        String planningDateSecond = DateSecond(7, 1);
+        String planningSimplyDate = simplyDate(7);
+
+        open("http://localhost:9999/");
+        $("[data-test-id='city'] input").setValue("Кр");
+        $x("//span[contains(@class,'menu-item__control')][contains(text(),'Краснодар')]").click();
+        $("[type=button] .icon-button__content").click();
+        $("[data-test-id ='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+
+        if (!planningDate.equals(planningDateSecond)) {
+            $("[data-step='1']").click();
+        }
+
+        int count = $$("table.calendar__layout td").size();
+
+        for (int i = 0; i < count; i++) {
+            String text = $$("table.calendar__layout td").get(i).getText();
+            if (text.equalsIgnoreCase(planningSimplyDate)) {
+                $$("table.calendar__layout td").get(i).click();
+            }
+
+        }
+        $("[data-test-id='name'] input ").setValue("Велев Максим");
+        $("[data-test-id='phone'] input ").setValue("+79756249171");
+        $("[data-test-id='agreement']").click();
+        $("[type=button] .button__content").click();
+        $x(".//div[@class='notification__title']")
+                .should(text("Успешно"), Duration.ofSeconds(5000))
+                .shouldBe(Condition.visible);
+        $("[data-test-id='notification'] .notification__content")
+                .shouldHave(text("Встреча успешно забронирована на " + planningDateSecondFormat), Duration.ofSeconds(5000))
                 .shouldBe(Condition.visible);
     }
 }
