@@ -209,26 +209,19 @@ public class OrderingCardDeliveryTest {
 
     ////////////// Задача №2: взаимодействие с комплексными элементами (необязательная)////////////
 
-    String DateSecond(int dayToAdd, int monthToAdd) {
-        return now().plusDays(dayToAdd).plusMonths(monthToAdd).format(DateTimeFormatter.ofPattern("MM"));
-    }
+    String dateSecond(int dayToAdd, String pattern) {
 
-    String DateSecondFormat(int dayToAdd, int monthToAdd) {
-        return now().plusDays(dayToAdd).plusMonths(monthToAdd).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-    }
-
-    String simplyDate(int daysToAdd) {
-        return now().plusDays(daysToAdd).format(DateTimeFormatter.ofPattern("dd"));
+        return now().plusDays(dayToAdd).format(DateTimeFormatter.ofPattern(pattern));
     }
 
     @Test
     // Планируем бронь карты через неделю
     public void orderCardDeliveryTestTwelfth() {
 
-        String planningDate = DateSecond(3, 0);
-        String planningDateSecond = DateSecond(7, 0);
-        String planningDateInForm = generateDate(7);
-        String planningSimplyDate = simplyDate(7);
+        String planningDate = dateSecond(3, "MM");
+        String planningDateSecond = dateSecond(7, "MM");
+        String planningDateInForm = dateSecond(7, "dd.MM.yyyy");
+        String planningSimplyDate = dateSecond(7, "dd");
 
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Кр");
@@ -265,10 +258,10 @@ public class OrderingCardDeliveryTest {
     // Планируем бронь карты через месяц
     public void orderCardDeliveryTestThirteenth() {
 
-        String planningDate = DateSecond(3, 0);
-        String planningDateSecondFormat = DateSecondFormat(7, 1);
-        String planningDateSecond = DateSecond(7, 1);
-        String planningSimplyDate = simplyDate(7);
+        String planningDate = dateSecond(3, "MM");
+        String planningDateSecondFormat = dateSecond(35, "dd.MM.yyyy");
+        String planningDateSecond = dateSecond(35, "MM");
+        String planningSimplyDate = dateSecond(35, "d");
 
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Кр");
